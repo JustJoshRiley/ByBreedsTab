@@ -1,117 +1,52 @@
-import React, {useState} from 'react';
-import { StatusBar } from 'expo-status-bar';
-import {KeyboardAvoidingView, Platform, StyleSheet, View, FlatList, SafeAreaView, TextInput, Text, Button } from 'react-native';
-import Item from './item';
-import {dogs} from './breeds';
+import React from 'react';
 
 import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import Feature from './feature';
+import { Ionicons } from 'react-native-vector-icons'
+import { FontAwesome5 } from '@expo/vector-icons'; 
 
-function HomeScreen({navigation}) {
-  const [search, setSearch] = useState('')
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="light" />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.kav}
-      >
-
-        <View style={styles.listContainer}>
-          <FlatList
-            data={dogs.filter(item  => item.breed.includes(search))}
-            renderItem={({item, index}) => {
-              // console.log(item)
-              return (
-              <View style={styles.itemContainer}>
-                <Item dog={item} index={index}/>
-                <Button
-                  title='Details'
-                  onPress={() => navigation.navigate('Features', {
-                  item:{item}
-                  })}
-                />
-              </View>
-              )
-            }}
-            keyExtractor={item => item.breed}
-          />
-          
-        </View>
-        <TextInput 
-          style={styles.search}
-          placeholder='Search Breed'
-          onChangeText={setSearch}
-          value={search}
-        />
-
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-
-  );
-}
-
-const Stack = createStackNavigator();
+import HomeScreen from './HomeScreen';
+import Dogs from './Dogs';
+import Cats from './Cats';
+const Tab = createBottomTabNavigator();
 
 function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen}/>
-        <Stack.Screen name="Features" component={Feature}/>
-      </Stack.Navigator>
+    <NavigationContainer >
+        <Tab.Navigator
+        initialRouteName='Home'
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+      
+            if (route.name === 'Home') {
+              iconName = focused
+                ? 'ios-information-house'
+                : 'ios-information-circle-outline';
+                return <FontAwesome5 name="house-user" size={24} color={color} />
+            } else if (route.name === 'Dogs') {
+              iconName = focused ? 'ios-dog' : 'ios-dog';
+              return <FontAwesome5 name="dog" size={24} color={color} />
+            } else if (route.name === 'Cats') {
+              iconName = focused ? 'ios-dog' : 'ios-dog';
+              return <FontAwesome5 name="cat" size={24} color={color} />
+            }
+      
+            // You can return any component that you like here!
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: 'tomato',
+          tabBarInactiveTintColor: 'gray'
+        })}
+        >
+          <Tab.Screen name="Dogs" component={Dogs} />
+          <Tab.Screen name="Home" component={HomeScreen} />
+          <Tab.Screen name="Cats" component={Cats} />
+        </Tab.Navigator>
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  kav: {
-    flex: 1,
-    justifyContent: "center",
-    width: '100%',
-    // marginBottom: 75,
-  },
-  container: {
-    flex: 1,
-    height: '100%',
-    backgroundColor: '#000',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 50,
-    
-  },
-  itemContainer: {
-    backgroundColor: 'grey',
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 2,
-    paddingTop: 10,
-    paddingBottom: 10,
-    width: 390,
-  },
-  listContainer: {
-    width: '100%'
-  },
-  search: {
-    fontSize: 24,
-    padding: 5,
-    backgroundColor:"pink",
-    color:"white",
-    width:"100%",
-    display: "flex",
-    justifyContent:"center",
-    alignItems: "center",
-    textAlign:"center",
-    height: 75,
-    width: '100%',
-    marginBottom: 40,
-    borderWidth: 10,
-    borderColor: "black"
-  }
-});
 
 export default App;
